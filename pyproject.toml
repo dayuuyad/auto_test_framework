@@ -1,0 +1,38 @@
+[project]
+name = "auto_test_framework"
+version = "1.0.0"
+description = "自动化测试框架"
+authors = [
+    { name = "Test Team", email = "test@example.com" },
+]
+requires-python = ">=3.7"
+dependencies = [
+    "pytest==7.4.3",
+    "requests==2.31.0",
+    "playwright>=1.40.0",
+    "python-dotenv==1.0.0",
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short --alluredir=reports/allure-results"
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+markers = [
+    "api: API测试",
+    "ui: UI测试",
+    "e2e: 端到端测试",
+]
+
+[tool.black]
+line-length = 120
+target-version = ["py37"]
+
+[tool.flake8]
+max-line-length = 120
+extend-ignore = ["E203", "W503"]

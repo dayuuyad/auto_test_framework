@@ -1,0 +1,30 @@
+users:
+  - id: 1
+    username: admin
+    email: admin@example.com
+    password: admin123
+  - id: 2
+    username: user
+    email: user@example.com
+    password: user123
+
+products:
+  - id: 1
+    name: 产品A
+    price: 100
+    stock: 10
+  - id: 2
+    name: 产品B
+    price: 200
+    stock: 5
+
+test_cases:
+  login:
+    valid:
+      username: admin
+      password: admin123
+      expected: success
+    invalid:
+      username: admin
+      password: wrongpassword
+      expected: error

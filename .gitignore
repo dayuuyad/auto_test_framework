@@ -1,0 +1,92 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 测试报告
+reports/
+
+# 依赖
+.venv/
+env/
+
+
+# allure
+allure*/
+
+# 环境变量
+.env
+
+# 临时文件
+*.tmp
+*.temp
+CACHEDIR.TAG
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.trae/
+
+# Docker
+.dockerignore
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+
+# 数据文件
+# data/excel/*.xlsx
+# data/excel/*.xls
+
+# Pytest缓存
+.pytest_cache/
+
+# 测试覆盖率报告
+htmlcov/
+.coverage
+.coverage.*
+
+# 测试报告和结果
+reports/
+allure-reports/
+allure-results/
+allure*/  # 已存在，但明确列出具体目录
+
+# Playwright浏览器缓存
+playwright/.cache/
+
+# 测试临时文件
+test-results/
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 配置文件（敏感信息）
+config/local_*.py
+config/*_secrets.py
+
+# 包管理
+pip-wheel-metadata/
+*.egg-info/
+
+# 构建产物
+build/
+dist/
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+
+# 压缩文件
+*.zip
+*.tar.gz
+*.tgz
