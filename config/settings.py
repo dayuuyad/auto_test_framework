@@ -41,22 +41,31 @@ class BaseConfig:
 class DevConfig(BaseConfig):
     API_BASE_URL = os.getenv('DEV_API_BASE_URL', 'https://dev-api.example.com')
     UI_BASE_URL = os.getenv('DEV_UI_BASE_URL', 'https://dev.example.com')
-
+    SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key')
+    APPID = os.getenv('APPID', 'your-appid')
+    SERVICE_CODE = os.getenv('SERVICE_CODE', 'your-servicecode')
+    
 # 测试环境配置
 class QaConfig(BaseConfig):
     API_BASE_URL = os.getenv('QA_API_BASE_URL', 'http://localhost:3000/api')
     UI_BASE_URL = os.getenv('QA_UI_BASE_URL', 'http://localhost:3000')
-
+    APPID = os.getenv('APPID', 'a44f2989875540')
+    SECRET_KEY = os.getenv('SECRET_KEY', '341e4782ec154bf2be5cdcbf9746a196')
+    SERVICE_CODE = os.getenv('SERVICE_CODE', 'contract003')
 # 预发布环境配置
 class StagingConfig(BaseConfig):
     API_BASE_URL = os.getenv('STAGING_API_BASE_URL', 'https://staging-api.example.com')
     UI_BASE_URL = os.getenv('STAGING_UI_BASE_URL', 'https://staging.example.com')
-
+    SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key')
+    APPID = os.getenv('APPID', 'a44f2989875540')
+    SERVICE_CODE = os.getenv('SERVICE_CODE', 'contract003')
 # 生产环境配置
 class ProdConfig(BaseConfig):
     API_BASE_URL = os.getenv('PROD_API_BASE_URL', 'https://api.example.com')
     UI_BASE_URL = os.getenv('PROD_UI_BASE_URL', 'https://example.com')
-
+    SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key')
+    APPID = os.getenv('APPID', 'a44f2989875540')
+    SERVICE_CODE = os.getenv('SERVICE_CODE', 'contract003')
 # 根据环境变量选择配置
 ENV = os.getenv('ENV', 'qa')
 

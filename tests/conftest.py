@@ -9,13 +9,20 @@ from api.base_api import BaseAPI
 from api import USER_API_ENDPOINTS
 from utils.logger import global_logger
 from utils.excel_reader import ExcelReader
+from utils.allure_hooks import pytest_runtest_call, pytest_runtest_teardown
 from config.settings import config
 
 EXCEL_DATA_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'excel', 'api_test_data.xlsx')
 
 @pytest.fixture(scope="session")
 def base_api():
-    api = BaseAPI(base_url=config.API_BASE_URL)
+    headers = {
+        "appid": config.APPID,
+        "servicecode": config.SERVICE_CODE,
+        "Content-Type": "application/json"
+    }
+    api = BaseAPI(base_url=config.API_BASE_URL, headers=headers)
+    api.set_signature_config(config.SECRET_KEY+config.SERVICE_CODE)
     yield api
     api.close()
 

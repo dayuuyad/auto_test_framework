@@ -1,13 +1,16 @@
 import openpyxl
 import json
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 from utils.logger import global_logger
 
 class ExcelReader:
-    def __init__(self, file_path: str):
+    JSON_FIELDS = ['测试body', '预期结果']
+    
+    def __init__(self, file_path: str, ignore_array_order: bool = False):
         self.file_path = file_path
         self.workbook = None
         self.logger = global_logger
+        self.ignore_array_order = ignore_array_order
     
     def load_workbook(self) -> None:
         try:
@@ -46,20 +49,24 @@ class ExcelReader:
         self.logger.info(f"从Sheet '{sheet_name}' 读取到 {len(data)} 条数据")
         return data
     
-    def parse_test_body(self, body_str: str) -> Dict:
-        if not body_str:
-            return {}
+    def parse_json_field(self, field_value: Any) -> Union[Dict, List, None]:
+        if not field_value:
+            return None
         
         try:
-            if isinstance(body_str, str):
-                return json.loads(body_str)
-            elif isinstance(body_str, dict):
-                return body_str
+            if isinstance(field_value, str):
+                return json.loads(field_value)
+            elif isinstance(field_value, (dict, list)):
+                return field_value
             else:
-                return {}
+                return None
         except json.JSONDecodeError as e:
-            self.logger.error(f"JSON解析失败: {e}, 原始数据: {body_str}")
-            return {}
+            self.logger.error(f"JSON解析失败: {e}, 原始数据: {field_value}")
+            return None
+    
+    def parse_test_body(self, body_str: str) -> Dict:
+        result = self.parse_json_field(body_str)
+        return result if isinstance(result, dict) else {}
     
     def filter_executable_cases(self, data: List[Dict]) -> List[Dict]:
         executable_cases = []
@@ -71,8 +78,13 @@ class ExcelReader:
                 is_executable = is_executable.upper().strip()
             
             if is_executable == True or is_executable == 'TRUE':
-                if '测试body' in case:
-                    case['测试body'] = self.parse_test_body(case['测试body'])
+                for field in self.JSON_FIELDS:
+                    if field in case and case[field]:
+                        case[field] = self.parse_json_field(case[field])
+                
+                if 'ignore_array_order' not in case:
+                    case['ignore_array_order'] = self.ignore_array_order
+                
                 executable_cases.append(case)
         
         self.logger.info(f"过滤后可执行的用例数: {len(executable_cases)}")
@@ -87,8 +99,8 @@ class ExcelReader:
             self.workbook.close()
             self.logger.info("关闭Excel文件")
 
-def get_excel_data(file_path: str, sheet_name: str) -> List[Dict]:
-    reader = ExcelReader(file_path)
+def get_excel_data(file_path: str, sheet_name: str, ignore_array_order: bool = False) -> List[Dict]:
+    reader = ExcelReader(file_path, ignore_array_order=ignore_array_order)
     try:
         data = reader.get_test_data(sheet_name)
         return data
