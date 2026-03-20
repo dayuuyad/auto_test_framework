@@ -13,6 +13,7 @@ from utils.allure_hooks import pytest_runtest_call, pytest_runtest_teardown
 from config.settings import config
 
 EXCEL_DATA_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'excel', 'api_test_data.xlsx')
+_test_data_cache = {}
 
 @pytest.fixture(scope="session")
 def base_api():
@@ -41,29 +42,32 @@ def page():
 def logger():
     return global_logger
 
-@pytest.fixture(scope="session")
-def excel_reader():
-    reader = ExcelReader(EXCEL_DATA_PATH)
-    yield reader
-    reader.close()
-
 def get_test_data(sheet_name: str):
+    if sheet_name in _test_data_cache:
+        return _test_data_cache[sheet_name]
+    
     reader = ExcelReader(EXCEL_DATA_PATH)
     try:
         data = reader.get_test_data(sheet_name)
+        _test_data_cache[sheet_name] = data
         return data
     finally:
         reader.close()
 
 def pytest_generate_tests(metafunc):
-    if "case_data" in metafunc.fixturenames:
-        test_function_name = metafunc.function.__name__
+    if "case_data" not in metafunc.fixturenames:
+        return
+    
+    marker = metafunc.definition.get_closest_marker("data_sheet")
+    if marker and marker.args:
+        sheet_name = marker.args[0]
+    else:
+        sheet_name = metafunc.function.__name__
+    
+    data = get_test_data(sheet_name)
+    if data:
+        # ids = [str(case.get('用例描述', f'case_{i}')) for i, case in enumerate(data)]
+        # metafunc.parametrize("case_data", data, ids=ids)
         
-        reader = ExcelReader(EXCEL_DATA_PATH)
-        try:
-            if test_function_name in reader.workbook.sheetnames if reader.workbook else False:
-                data = reader.get_test_data(test_function_name)
-                if data:
-                    metafunc.parametrize("case_data", data, ids=[str(case.get('用例描述', f'case_{i}')) for i, case in enumerate(data)])
-        finally:
-            reader.close()
+        metafunc.parametrize("case_data", data)
+        

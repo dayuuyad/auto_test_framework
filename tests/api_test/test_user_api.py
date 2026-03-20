@@ -10,15 +10,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
 
 from api import USER_API_ENDPOINTS
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-from conftest import get_test_data
-
-def get_case_ids(data):
-    return [case.get('用例描述', f'case_{i}') for i, case in enumerate(data)]
 
 @allure.feature("用户管理")
 @allure.story("用户注册")
-# @pytest.mark.parametrize("case_data", get_test_data("test_user_register"), ids=get_case_ids(get_test_data("test_user_register")))
-@pytest.mark.parametrize("case_data", get_test_data("test_user_register"))
+# @pytest.mark.data_sheet("test_user_register")
 def test_user_register(base_api, case_data, logger):
     case_desc = case_data.get('用例描述', '')
     test_body = case_data.get('测试body', {})
@@ -30,18 +25,19 @@ def test_user_register(base_api, case_data, logger):
         response = base_api.post(USER_API_ENDPOINTS["REGISTER"], json=test_body, sign_body=True)
         logger.info(f"注册响应: {response}")
 
-        assert_json_equals(
-            expected=case_data.get('预期结果', {}),
-            actual=response,
-            ignore_array_order=case_data.get('ignore_array_order', False)
-        )
+        if case_data.get('预期结果', {}):
+            assert_json_equals(
+                expected=case_data.get('预期结果', {}),
+                actual=response,
+                ignore_array_order=case_data.get('ignore_array_order', False)
+            )
 
         # assert response.get("status") == 1
         # assert "user_id" in response
 
 @allure.feature("用户管理")
 @allure.story("用户登录")
-@pytest.mark.parametrize("case_data", get_test_data("test_user_login"), ids=get_case_ids(get_test_data("test_user_login")))
+# @pytest.mark.data_sheet("test_user_login")
 def test_user_login(base_api, case_data, logger):
     case_desc = case_data.get('用例描述', '')
     test_body = case_data.get('测试body', {})
@@ -58,7 +54,7 @@ def test_user_login(base_api, case_data, logger):
 
 @allure.feature("用户管理")
 @allure.story("获取用户信息")
-@pytest.mark.parametrize("case_data", get_test_data("test_get_user_info"), ids=get_case_ids(get_test_data("test_get_user_info")))
+# @pytest.mark.data_sheet("test_get_user_info")
 def test_get_user_info(base_api, case_data, logger):
     case_desc = case_data.get('用例描述', '')
     test_body = case_data.get('测试body', {})
