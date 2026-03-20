@@ -1,7 +1,7 @@
 import openpyxl
-import json
 from typing import Any, Dict, List, Optional, Union
 from utils.logger import global_logger
+from utils.json_utils import safe_parse_json
 
 class ExcelReader:
     JSON_FIELDS = ['测试body', '预期结果']
@@ -49,25 +49,6 @@ class ExcelReader:
         self.logger.info(f"从Sheet '{sheet_name}' 读取到 {len(data)} 条数据")
         return data
     
-    def parse_json_field(self, field_value: Any) -> Union[Dict, List, None]:
-        if not field_value:
-            return None
-        
-        try:
-            if isinstance(field_value, str):
-                return json.loads(field_value)
-            elif isinstance(field_value, (dict, list)):
-                return field_value
-            else:
-                return None
-        except json.JSONDecodeError as e:
-            self.logger.error(f"JSON解析失败: {e}, 原始数据: {field_value}")
-            return None
-    
-    def parse_test_body(self, body_str: str) -> Dict:
-        result = self.parse_json_field(body_str)
-        return result if isinstance(result, dict) else {}
-    
     def filter_executable_cases(self, data: List[Dict]) -> List[Dict]:
         executable_cases = []
         
@@ -80,7 +61,7 @@ class ExcelReader:
             if is_executable == True or is_executable == 'TRUE':
                 for field in self.JSON_FIELDS:
                     if field in case and case[field]:
-                        case[field] = self.parse_json_field(case[field])
+                        case[field] = safe_parse_json(case[field], strict=True)
                 
                 if 'ignore_array_order' not in case:
                     case['ignore_array_order'] = self.ignore_array_order
@@ -93,6 +74,63 @@ class ExcelReader:
     def get_test_data(self, sheet_name: str) -> List[Dict]:
         data = self.get_sheet_data(sheet_name)
         return self.filter_executable_cases(data)
+    
+    def get_flow_sheets(self) -> List[str]:
+        if not self.workbook:
+            self.load_workbook()
+        
+        flow_sheets = []
+        for sheet_name in self.workbook.sheetnames:
+            if not sheet_name.startswith('-'):
+                flow_sheets.append(sheet_name)
+        
+        self.logger.info(f"发现 {len(flow_sheets)} 个流程Sheet")
+        return flow_sheets
+    
+    def get_flow_data(self, sheet_name: str) -> Dict:
+        if not self.workbook:
+            self.load_workbook()
+        
+        if sheet_name not in self.workbook.sheetnames:
+            self.logger.warning(f"流程Sheet '{sheet_name}' 不存在")
+            return {"flow_name": sheet_name, "steps": []}
+        
+        sheet = self.workbook[sheet_name]
+        steps = []
+        
+        headers = []
+        for cell in sheet[1]:
+            headers.append(cell.value)
+        
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            if not any(row):
+                continue
+            
+            row_data = {}
+            for i, value in enumerate(row):
+                if i < len(headers) and headers[i]:
+                    row_data[headers[i]] = value
+            
+            if row_data.get("接口地址"):
+                steps.append(row_data)
+        
+        self.logger.info(f"流程 '{sheet_name}' 包含 {len(steps)} 个步骤")
+        return {
+            "flow_name": sheet_name,
+            "steps": steps
+        }
+    
+    def get_all_flow_data(self) -> List[Dict]:
+        flow_sheets = self.get_flow_sheets()
+        all_flows = []
+        
+        for sheet_name in flow_sheets:
+            flow_data = self.get_flow_data(sheet_name)
+            if flow_data["steps"]:
+                all_flows.append(flow_data)
+        
+        self.logger.info(f"共读取 {len(all_flows)} 个流程")
+        return all_flows
     
     def close(self) -> None:
         if self.workbook:

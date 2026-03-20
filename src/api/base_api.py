@@ -18,6 +18,7 @@ class BaseAPI:
         # 用于存储请求和响应数据
         self._last_request_data = None
         self._last_response_data = None
+        self._request_callback = None
     
     def _capture_request_data(self, method: str, url: str, **request_kwargs) -> None:
         """捕获请求数据"""
@@ -46,6 +47,9 @@ class BaseAPI:
             'body': response.text,
             'json': self._safe_json_decode(response.text)
         }
+        
+        if self._request_callback:
+            self._request_callback(self._last_request_data, self._last_response_data)
     
     def get(self, endpoint: str, params: Optional[Dict[str, Any]] = None, **kwargs) -> Dict[str, Any]:
         """GET请求，自动处理URL格式化和错误检查"""
@@ -223,3 +227,11 @@ class BaseAPI:
         """清除存储的请求和响应数据"""
         self._last_request_data = None
         self._last_response_data = None
+    
+    def set_request_callback(self, callback) -> None:
+        """设置请求回调函数"""
+        self._request_callback = callback
+    
+    def clear_request_callback(self) -> None:
+        """清除请求回调函数"""
+        self._request_callback = None

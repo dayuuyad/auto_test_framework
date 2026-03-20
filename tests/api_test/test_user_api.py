@@ -18,7 +18,8 @@ def test_user_register(base_api, case_data, logger):
     case_desc = case_data.get('用例描述', '')
     test_body = case_data.get('测试body', {})
     
-    with allure.step(case_desc):
+    # with allure.step(case_desc):
+    if True:
         logger.info(f"开始测试: {case_desc}")
         logger.info(f"测试数据: {test_body}")
         

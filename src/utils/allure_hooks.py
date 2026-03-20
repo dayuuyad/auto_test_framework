@@ -70,38 +70,29 @@ def attach_request_response_to_allure(request_data: Optional[Dict[str, Any]],
                 )
 
 
+def attach_request_response_callback(request_data: Optional[Dict[str, Any]], 
+                                     response_data: Optional[Dict[str, Any]]) -> None:
+    """回调函数：实时将请求和响应数据附加到Allure报告"""
+    url = request_data.get('url', 'N/A') if request_data else 'N/A'
+    
+    with allure.step(f"调用接口: {url}"):
+        attach_request_response_to_allure(request_data, response_data)
+
+
 def pytest_runtest_call(item):
     """在每个测试用例执行时调用的hook"""
-    # 检查是否是API测试
-    if hasattr(item, 'fixturenames') and 'base_api' in item.fixturenames:
-        # 获取base_api fixture
-        base_api_fixture = None
-        for fixture_name in item.fixturenames:
-            if fixture_name == 'base_api':
-                base_api_fixture = item.funcargs.get('base_api')
-                break
+    if hasattr(item, 'funcargs') and 'base_api' in item.funcargs:
+        base_api_fixture = item.funcargs.get('base_api')
         
         if base_api_fixture:
-            # 在测试执行前清除之前的数据
             base_api_fixture.clear_request_response_data()
+            base_api_fixture.set_request_callback(attach_request_response_callback)
 
 
 def pytest_runtest_teardown(item, nextitem):
     """在每个测试用例执行后调用的hook"""
-    # 检查是否是API测试
-    if hasattr(item, 'fixturenames') and 'base_api' in item.fixturenames:
-        # 获取base_api fixture
-        base_api_fixture = None
-        for fixture_name in item.fixturenames:
-            if fixture_name == 'base_api':
-                base_api_fixture = item.funcargs.get('base_api')
-                break
+    if hasattr(item, 'funcargs') and 'base_api' in item.funcargs:
+        base_api_fixture = item.funcargs.get('base_api')
         
         if base_api_fixture:
-            # 获取请求和响应数据
-            request_data = base_api_fixture.get_last_request_data()
-            response_data = base_api_fixture.get_last_response_data()
-            
-            # 附加到Allure报告
-            if request_data or response_data:
-                attach_request_response_to_allure(request_data, response_data)
+            base_api_fixture.clear_request_callback()
