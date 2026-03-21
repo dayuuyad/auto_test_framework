@@ -14,13 +14,13 @@ def attach_request_response_to_allure(request_data: Optional[Dict[str, Any]],
                                    f"**请求URL:** {request_data.get('url', 'N/A')}\n"
                                    f"**状态码:** {response_data.get('status_code', 'N/A') if response_data else 'N/A'}")
         
-        # 附加请求头
-        if request_data.get('headers'):
-            allure.attach(
-                json.dumps(dict(request_data['headers']), indent=2, ensure_ascii=False),
-                name="请求头",
-                attachment_type=allure.attachment_type.JSON
-            )
+        # # 附加请求头
+        # if request_data.get('headers'):
+        #     allure.attach(
+        #         json.dumps(dict(request_data['headers']), indent=2, ensure_ascii=False),
+        #         name="请求头",
+        #         attachment_type=allure.attachment_type.JSON
+        #     )
         
         # 附加请求参数
         if request_data.get('params'):
@@ -45,13 +45,13 @@ def attach_request_response_to_allure(request_data: Optional[Dict[str, Any]],
             )
     
     if response_data:
-        # 附加响应头
-        if response_data.get('headers'):
-            allure.attach(
-                json.dumps(dict(response_data['headers']), indent=2, ensure_ascii=False),
-                name="响应头",
-                attachment_type=allure.attachment_type.JSON
-            )
+        # # 附加响应头
+        # if response_data.get('headers'):
+        #     allure.attach(
+        #         json.dumps(dict(response_data['headers']), indent=2, ensure_ascii=False),
+        #         name="响应头",
+        #         attachment_type=allure.attachment_type.JSON
+        #     )
         
         # 附加响应体
         response_body = response_data.get('json') or response_data.get('body')

@@ -77,12 +77,7 @@ def flow_test_engine(base_api, logger):
     yield engine
 
 def pytest_generate_tests(metafunc):
-    print(metafunc.fixturenames)    
-
-    if "case_data" or "flow_data" not in metafunc.fixturenames:
-        return
-    #如果metafunc.fixturenames包含case_data执行如下代码，否则执行flow_data  
-    if "case_data" in metafunc.fixturenames:        
+    if "case_data" in metafunc.fixturenames:
         marker = metafunc.definition.get_closest_marker("data_sheet")
         if marker and marker.args:
             sheet_name = marker.args[0]
@@ -90,35 +85,20 @@ def pytest_generate_tests(metafunc):
             sheet_name = metafunc.function.__name__
         
         data = get_test_data(sheet_name)
-    else:
-        flow_data = get_flow_test_data()
-        
-    if data or flow_data:
-        # ids = [str(case.get('用例描述', f'case_{i}')) for i, case in enumerate(data)]
-        # metafunc.parametrize("case_data", data, ids=ids)
-        
-        metafunc.parametrize("case_data", data or flow_data)
+        if data:
+            # ids = [str(case.get('用例描述', f'case_{i}')) for i, case in enumerate(data)]
+            # metafunc.parametrize("case_data", data, ids=ids)            
+            metafunc.parametrize("case_data", data)
+    
+    elif "flow_data" in metafunc.fixturenames:
+        data = get_flow_test_data()
+        if data:
+            # ids = [flow.get('flow_name', f'flow_{i}') for i, flow in enumerate(data)]
+            # metafunc.parametrize("flow_data", data, ids=ids)
+            metafunc.parametrize("flow_data",data)
+
         
 def pytest_sessionfinish(session, exitstatus):
-    generate_report()
+
     global_logger.info("测试会话完成")
 
-def generate_report():
-    """生成Allure报告"""
-    cmd = [
-        "allure", "generate",
-        config.ALLURE_RESULTS_DIR,
-        "-o", config.ALLURE_REPORT_DIR,
-        "--clean"
-    ]
-    
-    print(f"生成Allure报告: {' '.join(cmd)}")
-    import subprocess
-    result = subprocess.run(cmd, capture_output=True, text=True, shell=True)
-    
-    if result.returncode == 0:
-        print("Allure报告生成成功！")
-        print(f"报告路径: {config.ALLURE_REPORT_DIR}")
-    else:
-        print("Allure报告生成失败:")
-        print(result.stderr)

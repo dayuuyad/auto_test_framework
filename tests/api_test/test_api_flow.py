@@ -6,7 +6,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from conftest import get_flow_test_data
+# from conftest import get_flow_test_data
 
 @allure.feature("API流程测试")
 # @pytest.mark.parametrize("flow_data", get_flow_test_data(), ids=lambda x: x['flow_name'])

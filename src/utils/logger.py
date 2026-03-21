@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 from datetime import datetime
 
 class Logger:
@@ -15,12 +16,17 @@ class Logger:
         # 创建日志文件
         log_file = os.path.join(log_dir, f"test_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
         
+        # 设置控制台编码为UTF-8（必须在创建StreamHandler之前）
+        if sys.stdout.encoding != 'utf-8':
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+        
         # 创建文件处理器
         file_handler = logging.FileHandler(log_file, encoding='utf-8')
         file_handler.setLevel(logging.DEBUG)
         
         # 创建控制台处理器
-        console_handler = logging.StreamHandler()
+        console_handler = logging.StreamHandler(sys.stdout)
         console_handler.setLevel(logging.INFO)
         
         # 定义日志格式
