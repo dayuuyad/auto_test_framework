@@ -1,3 +1,4 @@
+from time import sleep
 import pytest
 import sys
 import os
@@ -12,6 +13,7 @@ from utils.logger import global_logger
 from utils.excel_reader import ExcelReader
 from utils.allure_hooks import pytest_runtest_call, pytest_runtest_teardown
 from utils.flow_test_engine import FlowTestEngine
+from utils.auth_manager import AuthManager
 from config.settings import config
 
 EXCEL_DATA_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'excel', 'api_test_data.xlsx')
@@ -35,13 +37,54 @@ def base_api():
 @pytest.fixture(scope="function")
 def page():
     with sync_playwright() as p:
-        browser = p.chromium.launch(channel="msedge", headless=False)
-        context = browser.new_context()
+        browser = p.chromium.launch(channel="msedge", 
+        headless=False,
+        args=["--start-maximized"]
+        )
+        context = browser.new_context(no_viewport=True)
         page = context.new_page()
+        
         yield page
+        
+        # import time
+        # time.sleep(10)
         page.close()
         context.close()
         browser.close()
+
+@pytest.fixture(scope="function")
+def authenticated_page(page, logger):
+    from ui.login_page import LoginPage
+    
+    auth = AuthManager(config)
+    cookies = auth.load_cookies()
+    
+    if cookies:
+        context = page.context
+        context.add_cookies(cookies)
+        
+        page.goto(config.UI_HOME_URL)
+        
+        # print(config.UI_HOME_URL, page.url)
+        page.wait_for_load_state("networkidle")
+        if config.UI_HOME_URL.lower() in page.url.lower():
+            logger.info("使用已保存的 cookie 登录成功")
+            yield page
+            return
+    
+    logger.info("cookie 无效或不存在，执行登录")
+    login_page = LoginPage(page)
+    login_page.navigate()
+    
+    if login_page.login(config.TEST_USERNAME, config.TEST_PASSWORD):
+        cookies = page.context.cookies()
+        auth.save_cookies(cookies)
+        logger.info("登录成功，已保存 cookie")
+    else:
+        # sleep(10)
+        raise Exception("登录失败，无法获取有效 cookie")
+    
+    yield page
 
 @pytest.fixture(scope="session")
 def logger():

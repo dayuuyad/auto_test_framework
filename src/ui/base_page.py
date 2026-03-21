@@ -1,22 +1,35 @@
 from playwright.sync_api import Page, Locator
 from typing import Optional, Tuple
+from config.settings import config
 
 class BasePage:
-    def __init__(self, page: Page):
+    def __init__(self, page: Page, url: str):
         self.page = page
-    
+        self.url = config.UI_BASE_URL + url
+        self.alert_message = "div[role='alert']"
+
     def navigate(self, url: str) -> None:
         self.page.goto(url)
     
+    def navigate(self) -> None:
+        self.page.goto(self.url)    
+
     def click(self, selector: str) -> None:
+        print("11111111111111111111111111111111111111111111111",selector)
         self.page.click(selector)
     
     def fill(self, selector: str, value: str) -> None:
         self.page.fill(selector, value)
     
-    def get_text(self, selector: str) -> str:
-        return self.page.inner_text(selector)
+    # def get_text(self, selector: str) -> str:
+    #     return self.page.inner_text(selector).strip()
     
+    def get_text(self, selector) -> str:
+        if isinstance(selector, Locator):
+            return selector.inner_text().strip()
+        return self.page.inner_text(selector).strip()    
+
+
     def is_visible(self, selector: str) -> bool:
         return self.page.is_visible(selector)
     
@@ -31,3 +44,12 @@ class BasePage:
     
     def get_url(self) -> str:
         return self.page.url()
+
+    def get_alert_message(self, timeout: int = None) -> str:
+        if timeout:
+            self.page.wait_for_selector(self.alert_message, timeout=timeout)
+        return self.get_text(self.alert_message)
+      
+
+    def wait_for_url_change(self) -> None:
+        self.page.wait_for_url_change()

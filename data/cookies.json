@@ -1,0 +1,15 @@
+{
+  "cookies": [
+    {
+      "name": "itrustoken",
+      "value": "LTMpPmsgwJ084VYR5iY",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1776701732.390378,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "expire_time": "2026-03-23T00:15:35.119228"
+}

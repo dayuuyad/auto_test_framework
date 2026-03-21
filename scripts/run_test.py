@@ -46,8 +46,6 @@ def run_tests(test_type=None, test_name=None):
     # 生成Allure报告
     # if result.returncode == 0:
     #     generate_report()
-    generate_report()
-
     return result.returncode
 
 def generate_report():
@@ -188,12 +186,21 @@ if __name__ == "__main__":
     import clean_data
     clean_data.main()
     
-    run_specific_test({
-    # "test_login": ["test_login_success", "test_login_fail"],
-    "test_user_api": ["test_user_register"],
-    "test_api_flow": ["test_api_flow"],
+    # run_specific_test({
+    # # "test_login": ["test_login_success", "test_login_fail"],
+    # "test_user_api": ["test_user_register"],
+    # "test_api_flow": ["test_api_flow"],
     
+    # },
+    #  test_type="api")
+    
+
+    run_specific_test({    
+    "test_login": ["test_successful_login"],    
     },
-     test_type="api")
-    
+     test_type="ui")
+
+
+
+    generate_report()
     open_report()

@@ -28,14 +28,18 @@ class BaseConfig:
     REDIS_DB = int(os.getenv('REDIS_DB', 0))
     
     # 测试配置
-    TEST_USERNAME = os.getenv('TEST_USERNAME', 'admin')
-    TEST_PASSWORD = os.getenv('TEST_PASSWORD', 'admin123')
+    TEST_USERNAME = os.getenv('TEST_USERNAME', '18575695125')
+    TEST_PASSWORD = os.getenv('TEST_PASSWORD', 'Aa123456')
     
     # 报告配置
     ALLURE_RESULTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'reports', 'allure-results')
     ALLURE_REPORT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'reports', 'allure-report')
     LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'reports', 'logs')
     SCREENSHOTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'reports', 'screenshots')
+    
+    # Cookie 配置
+    COOKIES_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'cookies.json')
+    COOKIE_EXPIRE_HOURS = 24
 
 # 开发环境配置
 class DevConfig(BaseConfig):
@@ -48,7 +52,8 @@ class DevConfig(BaseConfig):
 # 测试环境配置
 class QaConfig(BaseConfig):
     API_BASE_URL = os.getenv('QA_API_BASE_URL', 'http://localhost:3000/api')
-    UI_BASE_URL = os.getenv('QA_UI_BASE_URL', 'http://localhost:3000')
+    UI_BASE_URL = os.getenv('QA_UI_BASE_URL', 'http://localhost:8888/')
+    UI_HOME_URL = os.getenv('UI_HOME_URL', f'{UI_BASE_URL}/#/subview/contractweb/sysManage/list')
     APPID = os.getenv('APPID', 'a44f2989875540')
     SECRET_KEY = os.getenv('SECRET_KEY', '341e4782ec154bf2be5cdcbf9746a196')
     SERVICE_CODE = os.getenv('SERVICE_CODE', 'contract003')
