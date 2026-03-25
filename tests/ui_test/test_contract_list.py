@@ -3,10 +3,31 @@ import pytest
 import allure
 import sys
 import os
+from typing import Dict
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
 
 from ui.contract_list_page import ContractListPage
+
+
+def assert_search_results(contract_page: ContractListPage, expected: Dict[str, str]) -> None:
+    """验证搜索结果是否符合预期
+    
+    Args:
+        contract_page: 合同列表页面对象
+        expected: 期望的搜索结果键值对
+    """
+    results = contract_page.get_search_results()
+    
+    assert len(results) > 0, "搜索结果为空"
+    
+    for result in results:
+        for key, expected_value in expected.items():
+            actual_value = result.get(key, "")
+            if expected_value in actual_value:
+                print(f"{key}匹配: 期望包含 '{expected_value}', 实际 '{actual_value}'")
+            else:
+                raise AssertionError(f"{key}不匹配: 期望包含 '{expected_value}', 实际 '{actual_value}'")
 
 
 @allure.feature("合同列表功能")
@@ -14,14 +35,14 @@ from ui.contract_list_page import ContractListPage
 def test_search_by_contract_name(authenticated_page, logger):
     contract_page = ContractListPage(authenticated_page)
     logger.info("开始测试按合同名称搜索")
-    contract_page.navigate()
+    # contract_page.navigate()
     dict =  {
         "合同名称": "测试2",
         "合同编号": "2020260321000623654",
     }
     contract_page.search_by_dict(dict)
     
-    contract_page.assert_search_results(dict)    
+    assert_search_results(contract_page, dict)    
     contract_page.go_to_sign(dict)
     
     # logger.info(f"搜索到 {len(results)} 条记录")
@@ -127,7 +148,7 @@ def test_assert_search_results(authenticated_page, logger):
     
     contract_page.search_by_dict({"合同名称": "测试"})
     
-    contract_page.assert_search_results({"合同名称": "测试"})
+    assert_search_results(contract_page, {"合同名称": "测试"})
     
     logger.info("断言搜索结果测试通过")
 

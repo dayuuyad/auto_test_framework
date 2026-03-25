@@ -196,7 +196,9 @@ if __name__ == "__main__":
     
 
     run_specific_test({    
-    "test_login": ["test_successful_login"],    
+    # "test_login": ["test_successful_login"],
+    # "test_send_contract": ["test_send_contract_with_seal"],    
+    "test_sign_contract": ["test_sign_contract_with_password"],
     },
      test_type="ui")
 

@@ -3,6 +3,7 @@ import json
 from typing import List, Dict, Optional
 from playwright.sync_api import Page
 from .base_page import BasePage
+from .sign_contract_page import SignContractPage
 
 
 class ContractListPage(BasePage):
@@ -31,6 +32,7 @@ class ContractListPage(BasePage):
         }
     
     def search_by_dict(self, search_params: Dict[str, str]) -> None:
+        self.navigate()
         # self._wait_for_table_load()
         self.click(self.expand_button)
         
@@ -107,24 +109,9 @@ class ContractListPage(BasePage):
     def get_search_result_count(self) -> int:
         return self.page.locator(self.table_row).count()
     
-    def assert_search_results(self, expected: Dict[str, str]) -> None:
-        results = self.get_search_results()
-        
-        assert len(results) > 0, "搜索结果为空"
-        
-        for result in results:
-            for key, expected_value in expected.items():
-                actual_value = result.get(key, "")
-                # if key == "合同名称":
-                #     assert expected_value in actual_value, f"合同名称不匹配: 期望包含 '{expected_value}', 实际 '{actual_value}'"
-                # else:
-                #     assert expected_value in actual_value, f"{key}不匹配: 期望包含 '{expected_value}', 实际 '{actual_value}'"
-
-                assert expected_value in actual_value, f"{key}不匹配: 期望包含 '{expected_value}', 实际 '{actual_value}'"
-                print(f"{key}匹配: 期望包含 '{expected_value}', 实际 '{actual_value}'")
-
     
     def go_to_sign(self, search_params: Dict[str, str]) -> "SignContractPage":
+        self.wait_for_loading()
         self.search_by_dict(search_params)
         
         if self.get_search_result_count() == 0:
@@ -137,14 +124,13 @@ class ContractListPage(BasePage):
         # sign_button_buttons.click_first()
         
         # from .sign_contract_page import SignContractPage
-        # return SignContractPage(self.page)
+        return SignContractPage(self.page)
     
     def go_to_sign_by_json(self, json_string: str) -> "SignContractPage":
         search_params = json.loads(json_string)
         return self.go_to_sign(search_params)
     
-    def _wait_for_table_load(self, timeout: int = 10000) -> None:
-        
+    def _wait_for_table_load(self, timeout: int = 10000) -> None:        
         sleep(0.5)
         self.page.wait_for_selector(self.table_body, timeout=timeout)
     

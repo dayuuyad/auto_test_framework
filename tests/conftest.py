@@ -44,6 +44,9 @@ def page():
         context = browser.new_context(no_viewport=True)
         page = context.new_page()
         
+        # 设置默认超时时间为 10 秒
+        page.set_default_timeout(10000)
+        
         yield page
         
         # import time

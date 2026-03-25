@@ -35,6 +35,7 @@ class LoginPage(BasePage):
                 return True
             elif result == "图形验证码错误":
                 self.refresh_captcha()
+                self.wait_for_selector_disappear(self.alert_message)
                 continue
             else:
                 return False
