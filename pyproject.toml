@@ -5,7 +5,7 @@ description = "自动化测试框架"
 authors = [
     { name = "Test Team", email = "test@example.com" },
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.13"
 dependencies = [
     "pytest==7.4.3",
     "requests==2.31.0",

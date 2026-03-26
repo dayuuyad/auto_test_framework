@@ -1,0 +1,8 @@
+# 基础依赖
+pytest>=7.4.3
+requests>=2.31.0
+cryptography>=41.0.3
+openpyxl>=3.1.2
+# 开发依赖
+allure-pytest>=2.13.2
+allure-python-commons>=2.13.2

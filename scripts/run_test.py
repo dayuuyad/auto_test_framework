@@ -186,23 +186,23 @@ if __name__ == "__main__":
     import clean_data
     clean_data.main()
     
-    # run_specific_test({
-    # # "test_login": ["test_login_success", "test_login_fail"],
+    run_specific_test({
+    # "test_login": ["test_login_success", "test_login_fail"],
     # "test_user_api": ["test_user_register"],
-    # "test_api_flow": ["test_api_flow"],
+    "test_api_flow": ["test_api_flow"],
     
-    # },
-    #  test_type="api")
+    },
+     test_type="api")
     
 
-    run_specific_test({    
-    # "test_login": ["test_successful_login"],
-    # "test_send_contract": ["test_send_contract_with_seal"],    
-    "test_sign_contract": ["test_sign_contract_with_password"],
-    },
-     test_type="ui")
+    # run_specific_test({    
+    # # "test_login": ["test_successful_login"],
+    # # "test_send_contract": ["test_send_contract_with_seal"],    
+    # "test_sign_contract": ["test_sign_contract_with_password"],
+    # },
+    #  test_type="ui")
 
 
 
     generate_report()
-    open_report()
+    # open_report()
