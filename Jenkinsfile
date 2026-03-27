@@ -71,6 +71,7 @@ pipeline {
                         echo "Allure 结果路径: ${resultsPath}"
                     // 生成并发布 Allure 报告
                     allure([
+                        commandline: 'allure',
                         includeProperties: false,
                         jdk: '',
                         properties: [],
