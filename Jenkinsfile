@@ -21,6 +21,7 @@ pipeline {
                 steps {
                     checkout scm  // 使用 Jenkins 任务配置的分支
                     //git credentialsId: '112ff5dee-66f5-4fcc-8f99-563f88813d2c', url: 'git@github.com:dayuuyad/auto_test_framework.git'
+                    //git branch: 'main', credentialsId: '112ff5dee-66f5-4fcc-8f99-563f88813d2c', url: 'git@github.com:dayuuyad/auto_test_framework.git'
                 }
             }
             stage('docker build') {
@@ -51,7 +52,7 @@ pipeline {
                         
                         docker run --rm \
                             --name ${CONTAINER_NAME} \
-                            -v ${REPORTS_VOLUME}:/appnew/reports/allure-results \
+                            -v ${REPORTS_VOLUME}:/appnew/reports \
                             ${IMAGE_NAME}:${IMAGE_TAG}
                     '''
                 }
@@ -63,7 +64,7 @@ pipeline {
                             -v ${REPORTS_VOLUME}:/data \
                             -v ${JENKINS_VOLUME}:/jenkins_home \
                             alpine \
-                            sh -c "mkdir -p /jenkins_home/reports/${PROJECT_NAME}/allure-results && cp -r /data/* /jenkins_home/reports/${PROJECT_NAME}/allure-results/"
+                            sh -c "mkdir -p /jenkins_home/reports/${PROJECT_NAME}/allure-results && cp -r /data/allure-results/* /jenkins_home/reports/${PROJECT_NAME}/allure-results/"
                     '''
                     script {
                         allure includeProperties: false, jdk: '', results: [[path: "/var/jenkins_home/reports/${PROJECT_NAME}/allure-results"]]
@@ -75,15 +76,16 @@ pipeline {
         always {
             script {
                 try {
-                    def reportUrl = "${BUILD_URL}Allure_20Report/"
+                    def buildStatus = currentBuild.currentResult ?: 'UNKNOWN'
+                    def reportUrl = "${env.BUILD_URL}Allure_20Report/"
                     emailext (
-                        subject: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!",
+                        subject: "${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${buildStatus}!",
                         body: """
-$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
+${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${buildStatus}:
 
 测试报告地址: ${reportUrl}
 
-Check console output at $BUILD_URL to view the results.
+Check console output at ${env.BUILD_URL} to view the results.
                         """,
                         to: '904977900@qq.com'
                     )
