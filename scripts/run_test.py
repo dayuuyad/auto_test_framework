@@ -59,7 +59,7 @@ def generate_report():
     
     print(f"生成Allure报告: {' '.join(cmd)}")
 
-    result = subprocess.run(cmd, capture_output=True, text=True, shell=True, encoding='utf-8', errors='replace')
+    result = subprocess.run(cmd, capture_output=True, text=True, shell=sys.platform == 'win32', encoding='utf-8', errors='replace')
     
     if result.returncode == 0:
         print("Allure报告生成成功！")

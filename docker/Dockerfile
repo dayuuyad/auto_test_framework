@@ -1,7 +1,8 @@
 # FROM python:3.13-slim
-FROM python-allure-base:3.13
+# FROM python-allure-base:3.13
+FROM auto_test_framework:latest
 # 设置工作目录
-WORKDIR /app
+WORKDIR /appnew
 
 # # 安装Allure（需要Java环境）
 # RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -22,7 +23,7 @@ WORKDIR /app
 # ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 # 复制项目文件
-COPY . /app
+COPY . /appnew
 
 # 安装依赖
 RUN pip install --upgrade pip && \

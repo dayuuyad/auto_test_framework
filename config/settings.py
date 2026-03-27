@@ -51,8 +51,8 @@ class DevConfig(BaseConfig):
     
 # 测试环境配置
 class QaConfig(BaseConfig):
-    API_BASE_URL = os.getenv('QA_API_BASE_URL', 'http://localhost:3000/api')
-    UI_BASE_URL = os.getenv('QA_UI_BASE_URL', 'http://localhost:8888/')
+    API_BASE_URL = os.getenv('QA_API_BASE_URL', 'http://192.168.1.3:3000/api')
+    UI_BASE_URL = os.getenv('QA_UI_BASE_URL', 'http://192.168.1.3:8888/')
     UI_HOME_URL = os.getenv('UI_HOME_URL', f'{UI_BASE_URL}/#/subview/contractweb/sysManage/list')
     APPID = os.getenv('APPID', 'a44f2989875540')
     SECRET_KEY = os.getenv('SECRET_KEY', '341e4782ec154bf2be5cdcbf9746a196')
