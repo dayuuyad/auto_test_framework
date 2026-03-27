@@ -69,12 +69,15 @@ pipeline {
                     script {
                         def resultsPath = "/var/jenkins_home/reports/${env.PROJECT_NAME}/allure-results"
                         echo "Allure 结果路径: ${resultsPath}"
-                        allure(
-                            commandline: 'allure',
-                            includeProperties: false,
-                            jdk: '',
-                            results: [[path: resultsPath]]
-                        )
+                    // 生成并发布 Allure 报告
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        properties: [],
+                        reportBuildPolicy: 'ALWAYS',
+                        results: [[path: resultsPath]]
+                    ])
+                        
                     }
                 }
             }
