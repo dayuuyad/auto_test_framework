@@ -76,7 +76,7 @@ pipeline {
                         jdk: '',
                         properties: [],
                         reportBuildPolicy: 'ALWAYS',
-                        results: [[path: resultsPath]]
+                        results: [[path: '/var/jenkins_home/reports/auto_test_framework/allure-results']]
                     ])
                         
                     }
