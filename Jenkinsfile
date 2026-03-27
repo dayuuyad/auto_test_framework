@@ -19,7 +19,8 @@ pipeline {
     stages {
             stage('pull') {
                 steps {
-                    git credentialsId: '112ff5dee-66f5-4fcc-8f99-563f88813d2c', url: 'git@github.com:dayuuyad/auto_test_framework.git'
+                    checkout scm  // 使用 Jenkins 任务配置的分支
+                    //git credentialsId: '112ff5dee-66f5-4fcc-8f99-563f88813d2c', url: 'git@github.com:dayuuyad/auto_test_framework.git'
                 }
             }
             stage('docker build') {
@@ -73,18 +74,23 @@ pipeline {
     post {
         always {
             script {
-                def reportUrl = "${BUILD_URL}Allure_20Report/"
-                emailext (
-                    subject: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!",
-                    body: """
+                try {
+                    def reportUrl = "${BUILD_URL}Allure_20Report/"
+                    emailext (
+                        subject: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!",
+                        body: """
 $PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
 
 测试报告地址: ${reportUrl}
 
 Check console output at $BUILD_URL to view the results.
-                    """,
-                    to: '904977900@qq.com'
-                )
+                        """,
+                        to: '904977900@qq.com'
+                    )
+                    echo "邮件发送成功"
+                } catch (Exception e) {
+                    echo "邮件发送失败: ${e.getMessage()}"
+                }
             }
         }
         cleanup {
