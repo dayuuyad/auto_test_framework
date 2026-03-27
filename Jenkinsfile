@@ -67,7 +67,9 @@ pipeline {
                             sh -c "mkdir -p /jenkins_home/reports/${PROJECT_NAME}/allure-results && cp -r /data/allure-results/* /jenkins_home/reports/${PROJECT_NAME}/allure-results/"
                     '''
                     script {
-                        allure includeProperties: false, jdk: '', results: [[path: "/var/jenkins_home/reports/${PROJECT_NAME}/allure-results"]]
+                        def resultsPath = "/var/jenkins_home/reports/${env.PROJECT_NAME}/allure-results"
+                        echo "Allure 结果路径: ${resultsPath}"
+                        allure includeProperties: false, jdk: '', results: [[path: resultsPath]]
                     }
                 }
             }
@@ -77,7 +79,7 @@ pipeline {
             script {
                 try {
                     def buildStatus = currentBuild.currentResult ?: 'UNKNOWN'
-                    def reportUrl = "${env.BUILD_URL}Allure_20Report/"
+                    def reportUrl = "${env.BUILD_URL}allure/"
                     emailext (
                         subject: "${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - ${buildStatus}!",
                         body: """
