@@ -65,6 +65,12 @@ pipeline {
                             -v ${JENKINS_VOLUME}:/jenkins_home \
                             alpine \
                             sh -c "mkdir -p /jenkins_home/reports/${PROJECT_NAME}/allure-results && cp -r /data/allure-results/* /jenkins_home/reports/${PROJECT_NAME}/allure-results/"
+                        
+                        # 删除可能存在的旧链接
+                        rm -f ${WORKSPACE}/allure-results
+                        
+                        # 创建符号链接
+                        ln -sf /var/jenkins_home/reports/${PROJECT_NAME}/allure-results ${WORKSPACE}/allure-results                            
                     '''
                     script {
                         def resultsPath = "/var/jenkins_home/reports/${env.PROJECT_NAME}/allure-results"
@@ -75,8 +81,7 @@ pipeline {
                         includeProperties: false,
                         jdk: '',
                         properties: [],
-                        reportBuildPolicy: 'ALWAYS',
-                        results: [[path: '/var/jenkins_home/reports/auto_test_framework/allure-results']]
+                        reportBuildPolicy: 'ALWAYS'
                     ])
                         
                     }
