@@ -60,7 +60,7 @@ pipeline {
             stage('generate allure report') {
                 steps {
                     sh '''
-                        mkdir -p /var/jenkins_home/reports/${PROJECT_NAME}/allure-results \
+                        mkdir -p /var/jenkins_home/reports/${PROJECT_NAME}/allure-results
                         docker run --rm \
                             -v ${REPORTS_VOLUME}:/data \
                             -v ${JENKINS_VOLUME}:/jenkins_home \
