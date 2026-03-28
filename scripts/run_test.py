@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import argparse
 import subprocess
@@ -50,6 +51,20 @@ def run_tests(test_type=None, test_name=None):
 
 def generate_report():
     """生成Allure报告"""
+    # 将ALLURE_REPORT_DIR history下的所有文件复制到ALLURE_RESULTS_DIR的history目录下
+    if  os.path.exists(os.path.join(config.ALLURE_REPORT_DIR, "history")):
+        report_history_dir = os.path.join(config.ALLURE_REPORT_DIR, "history")
+        results_history_dir = os.path.join(config.ALLURE_RESULTS_DIR, "history")
+        os.makedirs(results_history_dir, exist_ok=True)
+        
+        for item in os.listdir(report_history_dir):
+            src = os.path.join(report_history_dir, item)
+            dst = os.path.join(results_history_dir, item)
+            if os.path.isdir(src):
+                os.makedirs(dst, exist_ok=True)
+            else:
+                shutil.copy2(src, dst)
+    
     cmd = [
         "allure", "generate",
         config.ALLURE_RESULTS_DIR,
@@ -67,13 +82,14 @@ def generate_report():
     else:
         print("Allure报告生成失败:")
         print(result.stderr)
+        # print(result.stderr)
 
-def open_report(port=8080):
+def open_report(port=8081):
     """
     打开Allure报告（使用allure open命令）
     
     Args:
-        port: HTTP服务器端口，默认8080
+        port: HTTP服务器端口，默认8081
     """
     report_dir = config.ALLURE_REPORT_DIR
     
@@ -204,5 +220,5 @@ if __name__ == "__main__":
 
 
 
-    generate_report()
+    # generate_report()
     # open_report()
