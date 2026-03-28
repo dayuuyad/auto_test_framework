@@ -66,10 +66,16 @@ pipeline {
                             -v ${JENKINS_VOLUME}:/jenkins_home \
                             alpine \
                             sh -c "cp -r /data/allure-results/* /jenkins_home/reports/${PROJECT_NAME}/allure-results/"
+                         
+                        # 删除可能存在的旧链接
+                        rm -f ${WORKSPACE}/allure-results
+                        
+                        # 创建符号链接
+                        ln -sf /var/jenkins_home/reports/${PROJECT_NAME}/allure-results ${WORKSPACE}/allure-results                        
                     '''
                     script {
-                        def resultsPath = "/var/jenkins_home/reports/${env.PROJECT_NAME}/allure-results"
-                        echo "Allure 结果路径: ${resultsPath}"
+                        // def resultsPath = "/var/jenkins_home/reports/${env.PROJECT_NAME}/allure-results"
+                        echo "Allure 结果路径: ${WORKSPACE}/allure-results"
                         // 生成并发布 Allure 报告
                         allure([
                             commandline: 'allure',
@@ -77,7 +83,7 @@ pipeline {
                             jdk: '',
                             properties: [],
                             reportBuildPolicy: 'ALWAYS',
-                            results: [[path: resultsPath]]
+                            results: [[path: "${WORKSPACE}/allure-results"]]
                         ])                        
                     }
                 }
