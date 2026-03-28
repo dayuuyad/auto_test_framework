@@ -112,8 +112,8 @@ Check console output at ${env.BUILD_URL} to view the results.
                 }
             }
         }
-        cleanup {
-            cleanWs()
-        }
+        // cleanup {
+        //     cleanWs()
+        // }
     }
 }
