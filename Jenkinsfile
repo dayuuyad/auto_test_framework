@@ -60,31 +60,25 @@ pipeline {
             stage('generate allure report') {
                 steps {
                     sh '''
+                        mkdir -p /var/jenkins_home/reports/${PROJECT_NAME}/allure-results \
                         docker run --rm \
                             -v ${REPORTS_VOLUME}:/data \
                             -v ${JENKINS_VOLUME}:/jenkins_home \
                             alpine \
-                            sh -c "mkdir -p /jenkins_home/reports/${PROJECT_NAME}/allure-results && cp -r /data/allure-results/* /jenkins_home/reports/${PROJECT_NAME}/allure-results/"
-                        
-                        # 删除可能存在的旧链接
-                        rm -f ${WORKSPACE}/allure-results
-                        
-                        # 创建符号链接
-                        ln -sf /var/jenkins_home/reports/${PROJECT_NAME}/allure-results ${WORKSPACE}/allure-results                            
+                            sh -c "cp -r /data/allure-results/* /jenkins_home/reports/${PROJECT_NAME}/allure-results/"
                     '''
                     script {
                         def resultsPath = "/var/jenkins_home/reports/${env.PROJECT_NAME}/allure-results"
                         echo "Allure 结果路径: ${resultsPath}"
-                    // 生成并发布 Allure 报告
-                    allure([
-                        commandline: 'allure',
-                        includeProperties: false,
-                        jdk: '',
-                        properties: [],
-                        reportBuildPolicy: 'ALWAYS',
-                        results: [[path: 'allure-results']]
-                    ])
-                        
+                        // 生成并发布 Allure 报告
+                        allure([
+                            commandline: 'allure',
+                            includeProperties: false,
+                            jdk: '',
+                            properties: [],
+                            reportBuildPolicy: 'ALWAYS',
+                            results: [[path: resultsPath]]
+                        ])                        
                     }
                 }
             }
